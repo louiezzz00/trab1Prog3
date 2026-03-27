@@ -280,9 +280,61 @@ async function cadastrarDispositivo() {
 }
 
 async function atualizarDispositivo() {
-  alert('Botão ATUALIZAR clicado!');
-  // TODO: Passo 4
+//Pegar o valor que o usuário digitou no campo ID
+const id = campoId.value.trim();
+//Validar: se o campo está vazio, avisar e parar
+    if (!id) {
+        mostrarMensagem('Digite um ID para buscar.', 'erro');
+        return; 
+        //"return" encerra a função aqui, nada abaixo executa
+    }
+    if (!campoNome) { 
+        mostrarMensagem('O nome do dispositivo é obrigatório.', 'erro'); 
+        return; 
+    } 
+// 3. Montar o objeto no formato que a API espera 
+// (consulte a documentação da API para saber o formato) / parseFloat() converte texto para número decimal. / Se o campo estiver vazio, parseFloat('') retorna NaN (Not a Num / Usamos o operador | para substituir NaN por 0. 
+const precoNumerico = parseFloat(preco) | 0; 
+const novoDispositivo = { 
+    name: nome, 
+    data: { 
+    color: cor, 
+    capacity: capacidade, 
+    price: precoNumerico 
+    } 
+}; 
+  try {
+    // Template Literal (acento grave) injeta a variável diretamente na URL
+    const respostaHTTP = await fetch(`https://api.restful-api.dev/objects/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(novoDispositivo)
+    });
+
+    const resultado = await respostaHTTP.json();
+    console.log('Produto atualizado.', resultado);
+  } catch (erro) {
+    console.error('Erro na atualização:', erro);
+  }
+
+// findIndex() percorre o vetor e retorna a POSIÇÃO (0, 1, 2...)
+// do primeiro item que satisfaz a condição.
+// Se não encontrar, retorna -1.
+const posicao = dispositivos.findIndex(d => d.id === id);
+
+if (posicao !== -1) {
+  // Substituir o item antigo pelo atualizado
+  dispositivos[posicao] = novoDispositivo;
 }
+
+  renderizar();
+  mostrarMensagem();
+}
+
+// Use o ID retornado no POST anterior:
+// atualizarDispositivo('ff808181932badb601936ea08b0f7ca7');
+
+
 
 async function excluirDispositivo() {
   alert('Botão EXCLUIR clicado!');
