@@ -3,7 +3,7 @@
 // ============================================================
 
 // Endereço base da API pública de testes
-const URL_API = 'https://api.restful-api.dev/objects';
+const URL_API = 'https://restful-apidevcloe.vercel.app/objects'; //'https://api.restful-api.dev/objects';
 
 // ============================================================
 // VETOR LOCAL (nosso "espelho" dos dados da API)
@@ -281,11 +281,11 @@ async function cadastrarDispositivo() {
 
 async function atualizarDispositivo() {
 //Pegar o valor que o usuário digitou no campo ID
-const id = campoId.value.trim();
-const nome = campoNome.value.trim();
-const cor = campoCor.value.trim();
-const capacidade = campoCapacidade.value.trim();
-const preco = campoPreco.value;
+  const id = campoId.value.trim();
+  const nome = campoNome.value.trim();
+  const cor = campoCor.value.trim();
+  const capacidade = campoCapacidade.value.trim();
+  const preco = campoPreco.value;
 //Validar: se o campo está vazio, avisar e parar
     if (!id) {
         mostrarMensagem('Digite um ID para buscar.', 'erro');
@@ -307,6 +307,7 @@ const novoDispositivo = {
     price: precoNumerico 
     } 
 }; 
+dispositivos.push(novoDispositivo);
   try {
     // Template Literal (acento grave) injeta a variável diretamente na URL
     const respostaHTTP = await fetch(`URL_API${id}`, {
@@ -330,21 +331,45 @@ if (posicao !== -1) {
   // Substituir o item antigo pelo atualizado
   dispositivos[posicao] = novoDispositivo;
 }
-  dispositivos.push(novoDispositivo);
   renderizar();
-  mostrarMensagem('Dispositivo "' + novoDispositivo.name + '" atualizado! ID: ' + novoDispositivo.id, 'sucesso');
+  limparFormulario();
+  mostrarMensagem('Dispositivo "' + novoDispositivo.name + '" atualizado!');
 }
 
 // Use o ID retornado no POST anterior:
 // atualizarDispositivo('ff808181932badb601936ea08b0f7ca7');
 
-
-
 async function excluirDispositivo() {
-  alert('Botão EXCLUIR clicado!');
-  // TODO: Passo 5
-}
+  const id = campoId.value.trim();
 
+  if (!id) {
+    mostrarMensagem('Digite um ID para excluir.', 'erro');
+    return; 
+  }
+
+  const confirmar = confirm('Tem certeza que deseja excluir?');
+  if (!confirmar) return;
+
+  try {
+    const respostaHTTP = await fetch(`URL_API${id}`, {
+      method: 'DELETE'
+    });
+
+    const resultado = await respostaHTTP.json();
+    console.log(resultado.message);
+
+    // 👇 Aqui entra o filter()
+    dispositivos = dispositivos.filter(dispositivo => dispositivo.id != id);
+
+  } catch (erro) {
+    console.error('Falha ao comunicar a deleção:', erro);
+    return;
+  }
+
+  renderizar();
+  limparFormulario();
+  mostrarMensagem('Dispositivo deletado!');
+}
 // ============================================================
 // EVENT LISTENERS (conectam os botões às funções)
 // ============================================================
